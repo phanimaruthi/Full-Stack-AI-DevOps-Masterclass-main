@@ -2,9 +2,7 @@ name: CI-CD-Demo
 
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    branches: [master]
 
 jobs:
   pipeline:
@@ -12,42 +10,64 @@ jobs:
 
     steps:
 
-      # Step 1
+      # 1. Checkout
       - name: Checkout code
-        run: echo "git checkout <repository-code>"
+        run: |
+          echo "git checkout main"
+          echo "Checkout completed successfully"
 
-      # Step 2
+      # 2. Dependencies
       - name: Install dependencies
-        run: echo "pip install -r requirements.txt"
+        run: |
+          echo "pip install -r requirements.txt"
+          echo "Dependencies installed successfully"
 
-      # Step 3
+      # 3. Lint
       - name: Lint
-        run: echo "ruff check ."
+        run: |
+          echo "ruff check ."
+          echo "Lint completed successfully"
 
-      # Step 4
+      # 4. Build
       - name: Build
-        run: echo "python setup/build command"
+        run: |
+          echo "python -m build"
+          echo "Build completed successfully"
 
-      # Step 5
+      # 5. Test
       - name: Run tests
-        run: echo "pytest"
+        run: |
+          echo "pytest -q"
+          echo "Tests passed successfully"
 
-      # Step 6
+      # 6. Package artifact
       - name: Package artifact
-        run: echo "tar -czf application.tar.gz ."
+        run: |
+          echo "tar -czf application.tar.gz dist/"
+          echo "Artifact packaged successfully"
 
-      # Step 7
+      # 7. Upload artifact
       - name: Upload artifact
-        run: echo "upload application.tar.gz to artifact repository"
+        run: |
+          echo "upload application.tar.gz to artifact repository"
+          echo "Artifact uploaded successfully"
 
-      # Step 8
+      # 8. Docker build
       - name: Docker build
-        run: echo "docker build -t myapp:latest ."
+        run: |
+          echo "docker build -t myapp:${GITHUB_SHA} ."
+          echo "Docker image built successfully"
 
-      # Step 9
+      # 9. Docker push
       - name: Docker push
-        run: echo "docker push <registry>/myapp:latest"
+        run: |
+          echo "docker push <registry>/myapp:${GITHUB_SHA}"
+          echo "Docker image pushed successfully"
 
-      # Step 10
+      # 10. Notification / failure demo
       - name: Notification
-        run: echo "send pipeline success/failure notification"
+        if: always()
+        run: |
+          echo "curl -X POST <webhook-url>"
+          echo "Pipeline completed successfully"
+          echo "Failure demo command: exit 1"
