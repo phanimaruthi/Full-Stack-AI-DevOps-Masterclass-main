@@ -1,0 +1,53 @@
+name: CI-CD-Demo
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Step 1
+      - name: Checkout code
+        run: echo "git checkout <repository-code>"
+
+      # Step 2
+      - name: Install dependencies
+        run: echo "pip install -r requirements.txt"
+
+      # Step 3
+      - name: Lint
+        run: echo "ruff check ."
+
+      # Step 4
+      - name: Build
+        run: echo "python setup/build command"
+
+      # Step 5
+      - name: Run tests
+        run: echo "pytest"
+
+      # Step 6
+      - name: Package artifact
+        run: echo "tar -czf application.tar.gz ."
+
+      # Step 7
+      - name: Upload artifact
+        run: echo "upload application.tar.gz to artifact repository"
+
+      # Step 8
+      - name: Docker build
+        run: echo "docker build -t myapp:latest ."
+
+      # Step 9
+      - name: Docker push
+        run: echo "docker push <registry>/myapp:latest"
+
+      # Step 10
+      - name: Notification
+        run: echo "send pipeline success/failure notification"
