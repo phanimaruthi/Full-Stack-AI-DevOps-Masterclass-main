@@ -55,6 +55,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: docker/app1-hello/springboot/hello-spring
+          file: docker/app1-hello/springboot/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/hello-spring:latest
