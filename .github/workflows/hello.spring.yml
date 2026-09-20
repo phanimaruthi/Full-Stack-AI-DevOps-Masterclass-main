@@ -26,6 +26,7 @@ jobs:
                     distribution: temurin
                     java-version: '21'
                     cache: maven
+                    cache-dependency-path: docker/app1-hello/springboot/hello-spring/pom.xml
 
             - name: Build and test with Maven
                 run: mvn --batch-mode clean verify
@@ -37,5 +38,5 @@ jobs:
                     name: spring-boot-test-reports
                     path: docker/app1-hello/springboot/hello-spring/target/surefire-reports/
                     if-no-files-found: warn
-            
+
 
