@@ -71,3 +71,25 @@ jobs:
           echo "curl -X POST <webhook-url>"
           echo "Pipeline completed successfully"
           echo "Failure demo command: exit 1"
+
+# """
+#  name--> identity
+#  on--> trigger
+#         ex: push
+#         ex: push, pull_request
+#         ex: push:
+#                 branches: ["working"]
+#             pull_request:
+#                 branches: ["working"]
+#  jobs-->work
+#  github  will provided us a sample linux
+#  steps --> actions
+#         -name--> name of particular step
+#         run/uses--> execution command 
+#  Every single step does only ONE of two things 
+#     Run a command
+#         ex: -name: Say hello --> create a linux machine and run this command in its terminal
+#             run: echo "hello from CI"
+#     Use a pre-built action
+
+# # """
