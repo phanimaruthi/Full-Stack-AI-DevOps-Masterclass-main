@@ -1,0 +1,41 @@
+name: Hello Spring Boot App
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
+    workflow_dispatch:
+
+jobs:
+    build-test:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: docker/app1-hello/springboot/hello-spring
+
+        steps:
+            - name: Checkout code
+                uses: actions/checkout@v4
+
+            - name: Set up JDK 21
+                uses: actions/setup-java@v4
+                with:
+                    distribution: temurin
+                    java-version: '21'
+                    cache: maven
+
+            - name: Build and test with Maven
+                run: mvn --batch-mode clean verify
+
+            - name: Upload test reports
+                if: always()
+                uses: actions/upload-artifact@v4
+                with:
+                    name: spring-boot-test-reports
+                    path: docker/app1-hello/springboot/hello-spring/target/surefire-reports/
+                    if-no-files-found: warn
+            
+
