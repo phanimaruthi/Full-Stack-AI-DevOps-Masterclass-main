@@ -1,0 +1,95 @@
+name: CI-CD-Demo
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # 1. Checkout
+      - name: Checkout code
+        run: |
+          echo "git checkout main"
+          echo "Checkout completed successfully"
+
+      # 2. Dependencies
+      - name: Install dependencies
+        run: |
+          echo "pip install -r requirements.txt"
+          echo "Dependencies installed successfully"
+
+      # 3. Lint
+      - name: Lint
+        run: |
+          echo "ruff check ."
+          echo "Lint completed successfully"
+
+      # 4. Build
+      - name: Build
+        run: |
+          echo "python -m build"
+          echo "Build completed successfully"
+
+      # 5. Test
+      - name: Run tests
+        run: |
+          echo "pytest -q"
+          echo "Tests passed successfully"
+
+      # 6. Package artifact
+      - name: Package artifact
+        run: |
+          echo "tar -czf application.tar.gz dist/"
+          echo "Artifact packaged successfully"
+
+      # 7. Upload artifact
+      - name: Upload artifact
+        run: |
+          echo "upload application.tar.gz to artifact repository"
+          echo "Artifact uploaded successfully"
+
+      # 8. Docker build
+      - name: Docker build
+        run: |
+          echo "docker build -t myapp:${GITHUB_SHA} ."
+          echo "Docker image built successfully"
+
+      # 9. Docker push
+      - name: Docker push
+        run: |
+          echo "docker push <registry>/myapp:${GITHUB_SHA}"
+          echo "Docker image pushed successfully"
+
+      # 10. Notification / failure demo
+      - name: Notification
+        if: always()
+        run: |
+          echo "curl -X POST <webhook-url>"
+          echo "Pipeline completed successfully"
+          echo "Failure demo command: exit 1"
+
+# """
+#  name--> identity
+#  on--> trigger
+#         ex: push
+#         ex: push, pull_request
+#         ex: push:
+#                 branches: ["working"]
+#             pull_request:
+#                 branches: ["working"]
+#  jobs-->work
+#  github  will provided us a sample linux
+#  steps --> actions
+#         -name--> name of particular step
+#         run/uses--> execution command 
+#  Every single step does only ONE of two things 
+#     Run a command
+#         ex: -name: Say hello --> create a linux machine and run this command in its terminal
+#             run: echo "hello from CI"
+#     Use a pre-built action
+
+# # """
