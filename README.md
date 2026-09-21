@@ -1,1 +1,1 @@
-FOr Learning pruporse
+For Learning pruporse
