@@ -13,18 +13,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: npm
-          cache-dependency-path: docker/app1-hello/node/package-lock.json
 
       - name: Install dependencies
         working-directory: docker/app1-hello/node
-        run: npm ci
+        run: npm install
 
       - name: Run tests
         working-directory: docker/app1-hello/node
@@ -36,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Login to Dockerhub
         uses: docker/login-action@v3
