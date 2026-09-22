@@ -1,0 +1,56 @@
+name: Node Tax Calculator Services
+
+on:
+  workflow_dispatch:
+
+  push:
+    paths:
+      - "docker/app2-tax-calculator/node/**"
+
+jobs:
+
+  build-service-a:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and Push Service A
+        uses: docker/build-push-action@v7
+        with:
+          context: docker/app2-tax-calculator/node/service-a
+          file: docker/app2-tax-calculator/node/service-a/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/node-tax-calculator-service-a:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/node-tax-calculator-service-a:${{ github.sha }}
+
+  build-service-b:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and Push Service B
+        uses: docker/build-push-action@v7
+        with:
+          context: docker/app2-tax-calculator/node/service-b
+          file: docker/app2-tax-calculator/node/service-b/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/node-tax-calculator-service-b:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/node-tax-calculator-service-b:${{ github.sha }}

@@ -1,0 +1,127 @@
+name: Hello Spring Boot App to Docker and EKS
+
+on:
+  workflow_dispatch:
+
+  push:
+    paths:
+      - "docker/app1-hello/springboot/hello-spring/**"
+      - ".github/workflows/hello-spring.yml"
+
+jobs:
+
+  # ============================================================
+  # CI: BUILD + TEST
+  # ============================================================
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build and test with Maven
+        working-directory: docker/app1-hello/springboot/hello-spring
+        run: mvn -B clean verify
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: docker/app1-hello/springboot/hello-spring/target/surefire-reports
+
+
+  # ============================================================
+  # BUILD + PUSH DOCKER IMAGE
+  # ============================================================
+  docker-build-push:
+    runs-on: ubuntu-latest
+    needs: build-test
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build JAR for Docker
+        working-directory: docker/app1-hello/springboot/hello-spring
+        run: mvn -B clean package -DskipTests
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v7
+        with:
+          context: docker/app1-hello/springboot/hello-spring
+          file: docker/app1-hello/springboot/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/hello-spring:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/hello-spring:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/hello-spring:${{ github.ref_name }}
+
+
+  # ============================================================
+  # CD: DEPLOY TO AWS EKS
+  # ============================================================
+  deploy-aws-eks:
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Update kubeconfig for EKS cluster
+        run: |
+          aws eks update-kubeconfig \
+            --region ap-south-1 \
+            --name hello-spring-eks-cluster
+
+      - name: Verify connection to EKS cluster
+        run: kubectl get nodes
+
+      - name: Deploy to EKS
+        run: |
+          kubectl apply -f docker/app1-hello/springboot/hello-spring/app.yaml
+
+      - name: Verify deployment
+        run: |
+          kubectl get deployments
+          kubectl get pods
+          kubectl get services
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/hello-spring --timeout=120s

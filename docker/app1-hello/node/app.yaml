@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-node
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: hello-node
+
+  template:
+    metadata:
+      labels:
+        app: hello-node
+
+    spec:
+      containers:
+        - name: hello-node
+          image: maruthi127/hello-node:latest
+          ports:
+            - containerPort: 3000
+
+          env:
+            - name: ENV_VALUE
+              value: "kubernetes"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-node-service
+
+spec:
+  type: NodePort
+
+  selector:
+    app: hello-node
+
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30080
