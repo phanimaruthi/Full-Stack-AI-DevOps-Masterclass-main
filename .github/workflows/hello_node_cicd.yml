@@ -6,7 +6,7 @@ on:
   push:
     paths:
       - "docker/app1-hello/node/**"
-      - ".github/workflows/hello_node_ci_cd.yml"
+      - ".github/workflows/hello_node_cicd.yml"
 
 jobs:
 
